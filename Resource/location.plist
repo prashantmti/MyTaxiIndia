@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>regionId</key>
+		<string>150696</string>
+		<key>locality</key>
+		<string>New Delhi</string>
+		<key>cityId</key>
+		<string>82</string>
+		<key>city</key>
+		<string>New Delhi</string>
+		<key>state</key>
+		<string>DELHI</string>
+	</dict>
+	<dict>
+		<key>regionId</key>
+		<string>150961</string>
+		<key>locality</key>
+		<string>Agra</string>
+		<key>cityId</key>
+		<string>352</string>
+		<key>city</key>
+		<string>Agra</string>
+		<key>state</key>
+		<string>UTTAR PRADESH</string>
+	</dict>
+	<dict>
+		<key>regionId</key>
+		<string>150908</string>
+		<key>locality</key>
+		<string>Jaipur</string>
+		<key>cityId</key>
+		<string>297</string>
+		<key>city</key>
+		<string>Jaipur</string>
+		<key>state</key>
+		<string>RAJASTHAN</string>
+	</dict>
+	<dict>
+		<key>regionId</key>
+		<string>150884</string>
+		<key>locality</key>
+		<string>Chandigarh</string>
+		<key>cityId</key>
+		<string>271</string>
+		<key>city</key>
+		<string>Chandigarh</string>
+		<key>state</key>
+		<string>CHANDIGARH</string>
+	</dict>
+	<dict>
+		<key>regionId</key>
+		<string>150727</string>
+		<key>locality</key>
+		<string>Gurgaon</string>
+		<key>cityId</key>
+		<string>113</string>
+		<key>city</key>
+		<string>Gurgaon</string>
+		<key>state</key>
+		<string>HARYANA</string>
+	</dict>
+	<dict>
+		<key>regionId</key>
+		<string>151056</string>
+		<key>locality</key>
+		<string>Noida</string>
+		<key>cityId</key>
+		<string>447</string>
+		<key>city</key>
+		<string>Noida</string>
+		<key>state</key>
+		<string>UTTAR PRADESH</string>
+	</dict>
+	<dict>
+		<key>regionId</key>
+		<string>150738</string>
+		<key>locality</key>
+		<string>Shimla</string>
+		<key>cityId</key>
+		<string>125</string>
+		<key>city</key>
+		<string>Shimla</string>
+		<key>state</key>
+		<string>HIMACHAL PRADESH</string>
+	</dict>
+	<dict>
+		<key>regionId</key>
+		<string>151047</string>
+		<key>locality</key>
+		<string>Manali</string>
+		<key>cityId</key>
+		<string>438</string>
+		<key>city</key>
+		<string>Manali</string>
+		<key>state</key>
+		<string>HIMACHAL PRADESH</string>
+	</dict>
+	<dict>
+		<key>regionId</key>
+		<string>151058</string>
+		<key>locality</key>
+		<string>Rishikesh</string>
+		<key>cityId</key>
+		<string>449</string>
+		<key>city</key>
+		<string>Rishikesh</string>
+		<key>state</key>
+		<string>UTTARAKHAND</string>
+	</dict>
+</array>
+</plist>
