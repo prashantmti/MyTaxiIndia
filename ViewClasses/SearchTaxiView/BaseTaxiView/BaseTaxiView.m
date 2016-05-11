@@ -22,7 +22,8 @@
     //
     self.mg=[ModalGlobal sharedManager];
     // Do any additional setup after loading the view.
-    
+    self.mg=[ModalGlobal sharedManager];
+    //
     _barButton.target = self.revealViewController;
     _barButton.action = @selector(revealToggle:);
     
@@ -30,14 +31,10 @@
     
     //
     [self setBaseViewAction:1];
-    
-    //
-    SWRevealViewController *revealController = [self revealViewController];
-    UITapGestureRecognizer *tap = [revealController tapGestureRecognizer];
-    tap.delegate = self;
-    [self.view addGestureRecognizer:tap];
-    
 }
+
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

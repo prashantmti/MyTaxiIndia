@@ -33,31 +33,43 @@
     pickerDataArray=[NSArray arrayWithObjects:@"1",@"2",@"3",@"4",@"5",@"6",@"7",nil];
     [self textWithOrdinalStyle:@"31"];
     
-   // NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:1448017312000];
-    
     //
-//    SWRevealViewController *revealController = [self revealViewController];
-//    UITapGestureRecognizer *tap = [revealController tapGestureRecognizer];
-//    tap.delegate = self;
-//    [self.view addGestureRecognizer:tap];
-    
+    CGFloat orgW=self.view.frame.size.width;
+    CGFloat orgPVH=180;
+    pickerView=[[UIPickerView alloc]initWithFrame:CGRectMake(0, self.view.bounds.size.height+44,orgW,orgPVH)];
+    pickerView.delegate = self;
+    pickerView.dataSource = self;
+    //
 }
 
-//GA
--(void)GATrackOnView:(NSString*)className kGAIScreenName:(NSString*)kGAIScreenName
-{
-    // returns the same tracker you created in your app delegate
-    // defaultTracker originally declared in AppDelegate.m
-    id tracker = [[GAI sharedInstance] defaultTracker];
-    
-    // This screen name value will remain set on the tracker and sent with
-    // hits until it is set to a new value or to nil.
-    [tracker set:kGAIScreenName value:className];
-    // manual screen tracking
-    [tracker send:[[GAIDictionaryBuilder createScreenView] build]];
-    [[GAI sharedInstance] dispatch];
+-(void)viewWillAppear:(BOOL)animated{
+    //
+    self.revealViewController.delegate = self;
 }
 
+//
+- (void)revealController:(SWRevealViewController *)revealController willMoveToPosition:(FrontViewPosition)position{
+    static NSInteger tagLockView = 4207868622;
+    if (revealController.frontViewPosition == FrontViewPositionRight) {
+        UIView *lock = [self.view viewWithTag:tagLockView];
+        [UIView animateWithDuration:0.3 animations:^{
+            lock.alpha = 0;
+        } completion:^(BOOL finished) {
+            [lock removeFromSuperview];
+        }];
+    } else if (revealController.frontViewPosition == FrontViewPositionLeft) {
+        UIView *lock = [[UIView alloc] initWithFrame:self.view.bounds];
+        lock.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        lock.tag = tagLockView;
+        lock.backgroundColor = [UIColor blackColor];
+        lock.alpha = 0;
+        [lock addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self.revealViewController action:@selector(revealToggle:)]];
+        [self.view addSubview:lock];
+        [UIView animateWithDuration:0.3 animations:^{
+            lock.alpha = 0.3;
+        }];
+    }
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -120,23 +132,18 @@
     }
     else{
         return TRUE;
-//        NSString *stringRegex = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
-//        NSPredicate *stringTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", stringRegex];
-//        return [stringTest evaluateWithObject:trimString];
     }
 }
 
 -(BOOL)validateEmail:(NSString *)email
 {
-    NSString *trimString = [email stringByTrimmingCharactersInSet:
-                            [NSCharacterSet whitespaceCharacterSet]];
-    if (trimString.length==0){
+    if (email.length==0){
         return FALSE;
     }
     else{
         NSString *emailRegex = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
         NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
-        return [emailTest evaluateWithObject:trimString];
+        return [emailTest evaluateWithObject:email];
     }
 }
 
@@ -153,13 +160,23 @@
         }
         else{
             return FALSE;
-//            NSString *Regex = @"^d{10}$";
-//            NSPredicate *mobileTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", Regex];
-//            return [mobileTest evaluateWithObject:trimString];
         }
     }
 }
 
+-(BOOL)validateJP:(NSString *)string{
+    if (string.length!=0){
+        if (string.length>=50){
+            return FALSE;
+        }else{
+            NSString *jpRegex = @"[a-zA-Z0-9]+";
+            NSPredicate *jpTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", jpRegex];
+            return [jpTest evaluateWithObject:string];
+        }
+    }else{
+        return TRUE;
+    }
+}
 
 -(BOOL)validateAddress:(NSString *)string
 {
@@ -305,18 +322,17 @@
     indexPickerView =row;
 }
 
+- (NSInteger)selectedRowInComponent:(NSInteger)component{
+    return 4;
+}
 
 #pragma - add toolbar
 
 
 -(void)addPickerViewWithToolBar:(UITextField*)textField{
     
-    CGFloat orgW=self.view.frame.size.width;
-    CGFloat orgPVH=180;
+
     
-    pickerView=[[UIPickerView alloc]initWithFrame:CGRectMake(0, self.view.bounds.size.height+44,orgW,orgPVH)];
-    pickerView.delegate = self;
-    pickerView.dataSource = self;
     pickerView.backgroundColor=[UIColor whiteColor];
     //Add ToolBar
     pickerViewtoolBar= [[UIToolbar alloc] initWithFrame:CGRectMake(0,0,320,44)];
@@ -348,6 +364,9 @@
 
 - (void)pickerViewDone:(CustomBarButton *)barbtn
 {
+    //
+    [pickerView selectRow:indexPickerView inComponent:0 animated:YES];
+    //
     if ([[pickerDataArray objectAtIndex:indexPickerView] isEqualToString:@"1"]) {
         barbtn.textField.text = [NSString stringWithFormat:@"%@ Day",[pickerDataArray objectAtIndex:indexPickerView]];
     }else{
@@ -370,7 +389,10 @@
     
     uint8_t digest[CC_SHA512_DIGEST_LENGTH] = {0};
     
-    CC_SHA512(keyData.bytes, keyData.length, digest);
+    //
+    int length = (int)keyData.length;
+    
+    CC_SHA512(keyData.bytes, length, digest);
     
     NSData *out = [NSData dataWithBytes:digest length:CC_SHA512_DIGEST_LENGTH];
     
@@ -475,6 +497,23 @@
     return finalString;
 }
 
+-(NSString*)valueRoundOff8:(NSString*)string{
+    NSString *finalString;
+    if ([string isEqual:[NSNull null]]) {
+        string=@"0";
+        finalString=string;
+    }else{
+        double strDouble = [string doubleValue];
+        NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+        [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+        [formatter setRoundingMode: NSNumberFormatterRoundHalfUp];
+        [formatter setMaximumFractionDigits:2];
+        NSString *numberString = [formatter stringFromNumber:[NSNumber numberWithDouble:strDouble]];
+        finalString=[numberString stringByReplacingOccurrencesOfString:@"," withString:@""];
+    }
+    return finalString;
+}
+
 
 -(void)setNavigationBarStyle{
     //0099cc
@@ -494,17 +533,17 @@
     [textField.layer addSublayer:bottomBorder];
     
     
-    //left border
-    CALayer *leftBorder = [CALayer layer];
-    leftBorder.frame = CGRectMake(0.0f, textField.frame.size.height-3, 1.0f,3);
-    leftBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [textField.layer addSublayer:leftBorder];
-
-    //right border
-    CALayer *rightBorder = [CALayer layer];
-    rightBorder.frame = CGRectMake(textField.frame.size.width-1,textField.frame.size.height-3, 1.0f,3);
-    rightBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [textField.layer addSublayer:rightBorder];
+//    //left border
+//    CALayer *leftBorder = [CALayer layer];
+//    leftBorder.frame = CGRectMake(0.0f, textField.frame.size.height-3, 1.0f,3);
+//    leftBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
+//    [textField.layer addSublayer:leftBorder];
+//
+//    //right border
+//    CALayer *rightBorder = [CALayer layer];
+//    rightBorder.frame = CGRectMake(textField.frame.size.width-1,textField.frame.size.height-3, 1.0f,3);
+//    rightBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
+//    [textField.layer addSublayer:rightBorder];
 }
 
 -(void)setViewLine:(UIView*)view
@@ -515,17 +554,17 @@
     bottomBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
     [view.layer addSublayer:bottomBorder];
     
-    //left border
-    CALayer *leftBorder = [CALayer layer];
-    leftBorder.frame = CGRectMake(0.0f, view.frame.size.height-3, 1.0f,3);
-    leftBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [view.layer addSublayer:leftBorder];
-    
-    //right border
-    CALayer *rightBorder = [CALayer layer];
-    rightBorder.frame = CGRectMake(view.frame.size.width-1,view.frame.size.height-3, 1.0f,3);
-    rightBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [view.layer addSublayer:rightBorder];
+//    //left border
+//    CALayer *leftBorder = [CALayer layer];
+//    leftBorder.frame = CGRectMake(0.0f, view.frame.size.height-3, 1.0f,3);
+//    leftBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
+//    [view.layer addSublayer:leftBorder];
+//    
+//    //right border
+//    CALayer *rightBorder = [CALayer layer];
+//    rightBorder.frame = CGRectMake(view.frame.size.width-1,view.frame.size.height-3, 1.0f,3);
+//    rightBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
+//    [view.layer addSublayer:rightBorder];
     
 }
 
@@ -547,30 +586,17 @@
 }
 
 
--(void)setButtonShadow:(UIButton*)button
-{
-    
-    //Bottom border
-    
-//    UIView *bottomBorder = [[UIView alloc] initWithFrame:CGRectMake(0, button.frame.size.height - 2.0f, button.frame.size.width,2)];
-//    bottomBorder.backgroundColor = [UIColor redColor];
-//    [button addSubview:bottomBorder];
-    
-    
+-(void)setButtonShadow:(UIButton*)button{
+    //
     CALayer *bottomBorder = [CALayer layer];
-    bottomBorder.frame = CGRectMake(0.0f,button.frame.size.height-10-2,button.frame.size.width,1.0f);
-    bottomBorder.backgroundColor =[self colorWithCode:@"666666"].CGColor;
+    bottomBorder.frame = CGRectMake(0,button.frame.size.height,button.frame.size.width,1.0f);
+    bottomBorder.backgroundColor =[self colorWithCode:@"000000"].CGColor;
     bottomBorder.masksToBounds = NO;
-    bottomBorder.shadowOffset = CGSizeMake(-0.2,0.3);
-    bottomBorder.shadowOpacity = 0.2;
+    bottomBorder.shadowOffset = CGSizeMake(-0.1,0.2);
+    bottomBorder.shadowOpacity = 0.1;
     [button.layer addSublayer:bottomBorder];
-    
-//    button.layer.borderWidth=1.0;
-//    button.layer.borderColor=[UIColor redColor].CGColor;
-//    button.layer.masksToBounds = NO;
-//    button.layer.shadowOffset = CGSizeMake(-0.2,0.1);
-//    button.layer.shadowOpacity = 0.1;
 }
+
 
 -(void)setButtonBorder:(UIButton*)button
 {
@@ -587,6 +613,71 @@
 }
 
 // --------------------Start Date format method-----------------------//
+-(NSDate*)currentDate{
+    //
+    NSDate* sourceDate = [NSDate date];
+    
+    NSTimeZone* sourceTimeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+    NSTimeZone* destinationTimeZone = [NSTimeZone systemTimeZone];
+    
+    NSInteger sourceGMTOffset = [sourceTimeZone secondsFromGMTForDate:sourceDate];
+    NSInteger destinationGMTOffset = [destinationTimeZone secondsFromGMTForDate:sourceDate];
+    NSTimeInterval interval = destinationGMTOffset - sourceGMTOffset;
+    
+    NSDate* destinationDate =[[NSDate alloc] initWithTimeInterval:interval sinceDate:sourceDate];
+    //
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"dd/MM/yyyy"];
+    [dateFormat setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+    //
+    NSString *dateStr=[dateFormat stringFromDate:destinationDate];
+    //NSLog(@"msToDate dateStr===>%@",dateStr);
+    //
+    NSDate *newDate = [[NSDate alloc] init];
+    newDate = [dateFormat dateFromString:dateStr];
+    //NSLog(@"msToDate newDate===>%@",newDate);
+    //
+    return newDate;
+}
+
+-(NSDate*)msToDate:(NSString*)ms{
+    //
+    NSString *msStr=[self stringFormat:ms];
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:([msStr doubleValue] / 1000)];
+    //NSLog(@"msToDate date===>%@",date);
+    //
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"dd/MM/yyyy"];
+    [dateFormat setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+    //
+    NSString *dateStr=[dateFormat stringFromDate:date];
+    //NSLog(@"msToDate dateStr===>%@",dateStr);
+    //
+    NSDate *newDate = [[NSDate alloc] init];
+    newDate = [dateFormat dateFromString:dateStr];
+    //NSLog(@"msToDate newDate===>%@",newDate);
+    //
+    return newDate;
+}
+
+-(NSString*)currentToUTCms{
+    NSString* msUTCDate=[NSString stringWithFormat:@"%lli000",[@(floor([[NSDate date] timeIntervalSince1970])) longLongValue]];
+    return msUTCDate;
+}
+
+-(NSString*)currentDateStr{
+    //
+    NSDate* date = [NSDate date];
+    NSLog(@"currentDateStr date===>%@",date);
+    //
+    NSDateFormatter* dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"dd/MM/yyyy"];
+    //
+    NSString *dateStr=[dateFormat stringFromDate:date];
+    //NSLog(@"currentDateStr dateStr===>%@",dateStr);
+    return dateStr;
+}
+
 -(NSDate*)dateInIST{
     //
     NSDate* datetime = [NSDate date];
@@ -597,6 +688,8 @@
     NSString* dateTimeStrInIST =[dateFormatter stringFromDate:datetime];
     return [dateFormatter dateFromString:dateTimeStrInIST];
 }
+
+
 
 -(NSDate*)dateStringToDate:(NSString*)dateString
 {
@@ -731,7 +824,7 @@
 
 -(NSDate*)dateWithNextYearDate:(NSDate*)nsdate{
     NSDate *today = [[NSDate alloc] init];
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents *offsetComponents = [[NSDateComponents alloc] init];
     [offsetComponents setYear:1];
     NSDate *nextYearDate = [gregorian dateByAddingComponents:offsetComponents toDate:today options:0];
@@ -775,6 +868,27 @@
     return dateStr;
 }
 
+-(NSString*)msToUTCms:(NSString*)msStr{
+    
+    NSTimeZone *timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:([msStr doubleValue] / 1000)];
+    
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    //
+    [dateFormat setTimeZone:timeZone];
+    [dateFormat setDateFormat:@"dd/MM/yyyy HH:mm:SS"];
+    
+    NSString *dateStr=[dateFormat stringFromDate:date];
+    
+    NSDate *newDate = [[NSDate alloc] init];
+    newDate = [dateFormat dateFromString:dateStr];
+    
+    NSString *msUTCDate=[NSString stringWithFormat:@"%lli000",[@(floor([newDate timeIntervalSince1970])) longLongValue]];
+    return msUTCDate;
+}
+
+
+
 -(NSString*)msWithOrdinalStyle_ddMMyy:(NSString*)ms
 {
     NSString *returnDate,*setDate;   // 1st Jan 16
@@ -799,5 +913,15 @@
     NSString *trimmedString = [string stringByTrimmingCharactersInSet:
                                [NSCharacterSet whitespaceCharacterSet]];
     return trimmedString;
+}
+
+-(NSString*)getCity:(NSString*)string{
+    NSArray*splitArray=[string componentsSeparatedByString:@","];
+    return splitArray[0];
+}
+
+-(void)setFlurry:(NSString*)logEvent params:(NSDictionary*)params{
+    //
+    [Flurry logEvent:logEvent withParameters:params];
 }
 @end

@@ -369,6 +369,10 @@ static CGFloat scaledValue( CGFloat v1, CGFloat min2, CGFloat max2, CGFloat min1
     void (^_completion)(void);
 }
 
+- (CGAffineTransform)targetTransform  {
+    
+    return self.targetTransform;
+}
 
 - (id)initWithRevealController:(SWRevealViewController*)revealVC containerView:(UIView*)view fromVC:(UIViewController*)fromVC
     toVC:(UIViewController*)toVC completion:(void (^)(void))completion
@@ -683,15 +687,6 @@ const int FrontViewPositionNone = 0xff;
     // intercepting it on the panGestureBegan and panGestureEnded delegates
     _userInteractionStore = _contentView.userInteractionEnabled;
 }
-
-
-- (NSUInteger)supportedInterfaceOrientations
-{
-    // we could have simply not implemented this, but we choose to call super to make explicit that we
-    // want the default behavior.
-    return [super supportedInterfaceOrientations];
-}
-
 
 #pragma mark - Public methods and property accessors
 
@@ -1176,7 +1171,7 @@ const int FrontViewPositionNone = 0xff;
     NSTimeInterval duration = _toggleAnimationDuration;
 
     // Velocity driven change:
-    if (fabsf(velocity) > _quickFlickVelocity)
+    if (fabs(velocity) > _quickFlickVelocity)
     {
         // we may need to set the drag position and to adjust the animation duration
         CGFloat journey = xLocation;
@@ -1194,7 +1189,7 @@ const int FrontViewPositionNone = 0xff;
             }
         }
         
-        duration = fabsf(journey/velocity);
+        duration = fabs(journey/velocity);
     }
     
     // Position driven change:

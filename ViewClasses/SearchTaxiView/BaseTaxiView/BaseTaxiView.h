@@ -11,7 +11,7 @@
 #import "LocalStationView.h"
 #import "OutStationView.h"
 
-@interface BaseTaxiView : BaseView<UIGestureRecognizerDelegate>
+@interface BaseTaxiView : BaseView
 
 
 @property (weak, nonatomic) IBOutlet UIView *LocalTaxiCView;
@@ -23,7 +23,4 @@
 
 @property (weak,nonatomic) IBOutlet UIBarButtonItem *barButton;
 
-@property (weak,nonatomic) IBOutlet TPKeyboardAvoidingScrollView *TPscrollBar;
-
-@property (strong, nonatomic) ModalGlobal *mg;
 @end

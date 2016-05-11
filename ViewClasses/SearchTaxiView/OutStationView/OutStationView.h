@@ -11,7 +11,7 @@
 #import "BaseView.h"
 #import "AutoCityView.h"
 #import "CabListView.h"
-#import "CabDetailsView.h"
+
 
 #import "PopPickerView.h"
 #import "SearchTaxiModal.h"
@@ -35,6 +35,8 @@
 }
 
 //
+@property (weak,nonatomic) IBOutlet UIBarButtonItem *barButton;
+//
 @property (strong, nonatomic) BaseView *baseView;
 //
 @property(assign, nonatomic) BOOL *isShowUvMoreCity;
@@ -53,7 +55,6 @@
 
 
 //@property (strong, nonatomic) PayUModelHashes *setPayUHashes;
-@property (strong, nonatomic) ModalGlobal *mg;
 
 
 
@@ -76,16 +77,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnAddMoreCity;
 @property (weak, nonatomic) IBOutlet UIButton *btnSearchTaxi;
 
-
-
-
 @property (strong, nonatomic) NSString *selectedLocation;
-
 
 @property(strong,nonatomic) NSString *selectedDateFromDP;
 
 @property(strong,nonatomic) UIDatePicker *datePicker;
-
 
 @property(strong,nonatomic) NSString *pickupDate,*dropDate;
 

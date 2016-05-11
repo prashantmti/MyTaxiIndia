@@ -24,9 +24,12 @@
     //
     self.mg=[ModalGlobal sharedManager];
     //
-    [self setTextBoxStyleLine:_tfDepartureCity];
-    [self setTextBoxStyleLine:_tfArrivalCity];
-    [self setTextBoxStyleLine:_tfAddMoreCity];
+    _barButton.target = self.revealViewController;
+    _barButton.action = @selector(revealToggle:);
+    //
+    [self setTextBoxLine:_tfDepartureCity];
+    [self setTextBoxLine:_tfArrivalCity];
+    [self setTextBoxLine:_tfAddMoreCity];
     
     
     [self setUI];
@@ -35,7 +38,7 @@
     _tfAddMoreCity.inputView=nil;
     _tfArrivalCity.inputView=nil;
     _tfDepartureCity.inputView=nil;
-
+    
     selectedTripCites=[[NSMutableDictionary alloc]init];
     [selectedTripCites setObject:@"" forKey:@"city1"];
     [selectedTripCites setObject:@"" forKey:@"city2"];
@@ -43,23 +46,22 @@
     //hide other City textBox
     IVaddMoreCity.hidden=TRUE;
     
-
+    
     // set date picker on DPView
     [self setGesturesOnDPView1];
     [self setGesturesOnDPView2];
-
+    
     [self setTripTypeAction:0];
     [self hideDropView:0];
     [self setAddMoreCityView:1];
-    
-    
+    //
+    [self setFlurry:@"OutStation Booking" params:nil];
 }
 
 
--(void)setUI
-{
+-(void)setUI{
+    //
     _isShowPicker=FALSE;
-    
     //
     [self setBoxShadow:uvTripAction];
     [self setBoxShadow:uvFrom];
@@ -68,7 +70,7 @@
     [self setBoxShadow:uvDpPicker];
     
     //
-    [self setButtonShadow:_btnSearchTaxi];
+    //[self setButtonShadow:_btnSearchTaxi];
     [self setButtonBorder:_btnAddMoreCity];
     
     //
@@ -79,27 +81,14 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
+    //[self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
     
     //
-
+    
 }
 
-//- (void)dispatch {
-//    
-//    //self.screenName = @"mytaxiindia";
-//    NSMutableDictionary *event =
-//    [[GAIDictionaryBuilder createEventWithCategory:@"UI"
-//                                            action:@"load"
-//                                             label:@"OSV Appear"
-//                                             value:nil] build];
-//    [[GAI sharedInstance].defaultTracker send:event];
-//    [[GAI sharedInstance] dispatch];
-//}
-
-
-
 -(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:YES];
     //
     if ([self.mg.mbt.tripActionComplete isEqual:@"YES"]) {
         _tfDepartureCity.text=nil;
@@ -132,14 +121,14 @@
     }else if ([[returnResponse valueForKey:@"locationTag"] integerValue]==102) {
         self.mg.mbt.arrivalCity=city;
         self.mg.mbt.arrivalLocation=location;
-    
+        
         _tfArrivalCity.text=[self.mg.mbt.arrivalLocation capitalizedString];
         [selectedTripCites setObject:[[returnResponse valueForKey:@"locationDic"] valueForKey:@"cityId"] forKey:@"city2"];
     }
     else if ([[returnResponse valueForKey:@"locationTag"] integerValue]==103) {
         self.mg.mbt.arrivalMoreCity=city;
         self.mg.mbt.arrivalMoreLocation=location;
-    
+        
         _tfAddMoreCity.text=[location capitalizedString];
         [selectedTripCites setObject:[[returnResponse valueForKey:@"locationDic"] valueForKey:@"cityId"] forKey:@"city3"];
     }
@@ -153,7 +142,7 @@
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    // tripType =>0:for local | 1 for outstation
+    // tripTag =>0:for local | 1 for outstation
     
     textField.inputView=nil;
     [textField resignFirstResponder];
@@ -275,10 +264,11 @@
     //
     datePicker.timeZone=[NSTimeZone timeZoneWithAbbreviation:@"IST"];
     if (tag==1001) {
-        NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"];
+        NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
         //
         datePicker.locale=locale;
         datePicker.datePickerMode = UIDatePickerModeDateAndTime;
+        datePicker.minuteInterval=5;
         datePicker.date=[self dateStringToDateTime:pickupDate]; //For One Way
         datePicker.minimumDate=[self dateInIST];
         datePicker.maximumDate=[self dateWithNextYearDate:[self dateInIST]];
@@ -428,7 +418,7 @@
         [rtBtn setTitleColor:[self colorWithCode:@"1896C1"] forState:UIControlStateNormal];
     }else if (sender==1){
         tripType=@"1";  //for Return Way
-
+        
         [owBtn setBackgroundColor:[self colorWithCode:@"ffffff"]];
         [owBtn setTitleColor:[self colorWithCode:@"1896C1"] forState:UIControlStateNormal];
         
@@ -458,7 +448,7 @@
         _isAddMoreCtiy=TRUE;
         _btnAddMoreCity.tag=1;
         [_btnAddMoreCity setTitle:@"Remove City" forState:UIControlStateNormal];
-       
+        
         uvMoreCity.hidden=FALSE;
         //
         CGRect uvDpPickerFrame = uvDpPicker.frame;
@@ -512,7 +502,8 @@
 -(void)callService{
     
     //set setModalBaseTaxi
-    self.mg.mbt.departureDate=[self splitString:pickupDate pattern:@" "][0];
+    //self.mg.mbt.departureDate=[self splitString:pickupDate pattern:@" "][0];
+    self.mg.mbt.departureDate=pickupDate;
     self.mg.mbt.returnDate=dropDate;
     self.mg.mbt.tripType=tripType;
     self.mg.mbt.locationIds=[self locationIDdicToStr:selectedTripCites];
@@ -534,7 +525,11 @@
         if (success) {
             if ([[response valueForKey:@"status"] isEqualToString:@"error"])
             {
-                [self alertWithText:@"Error!" message:[response valueForKey:@"error"]];
+                //[self alertWithText:@"Error!" message:[response valueForKey:@"error"]];
+                
+                NSString *alertStr=[NSString stringWithFormat:@"%@\n%@",[response valueForKey:@"error"],@"In case of urgent booking, you can contact us on the following:\nPhone: +91-888-200-1133\nE-Mail: booking@mytaxiindia.com"];
+                UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:@"MyTaxiIndia" message:alertStr delegate:self cancelButtonTitle:@"Dismiss" otherButtonTitles:@"Call", nil] ;
+                [alertView show];
                 return;
             }else{
                 cabList=[[[response valueForKey:@"result"] valueForKey:@"results"] valueForKey:@"taxis"];
@@ -549,6 +544,22 @@
     }];
 }
 
+
+-(void)playLocalNotification:(UIApplication*)application userInfo:(NSDictionary*)userInfo{
+    NSString *alert=[[[userInfo valueForKey:@"aps"] valueForKey:@"alert"] valueForKey:@"body"];
+    //
+    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:@"MyTaxiIndia" message:alert delegate:self cancelButtonTitle:@"Dismiss" otherButtonTitles:@"Show", nil] ;
+    [alertView show];
+    
+}
+
+- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex{
+    if(buttonIndex==1) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"tel:+91-888-200-1133"]];
+    }
+}
+
+
 -(NSString*)locationIDdicToStr:(NSDictionary*)setDic
 {
     NSString *string=@"";
@@ -562,31 +573,5 @@
         string=[NSString stringWithFormat:@"%@,%@",city1,city2];
     }
     return string;
-}
-
-
--(void)setTextBoxStyleLine:(UITextField*)textField
-{
-    textField.backgroundColor=[UIColor clearColor];
-    textField.borderStyle=UITextBorderStyleNone;
-    
-    //Bottom border
-    CALayer *bottomBorder = [CALayer layer];
-    bottomBorder.frame = CGRectMake(0.0f, textField.frame.size.height - 1, textField.frame.size.width, 1.0f);
-    bottomBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [textField.layer addSublayer:bottomBorder];
-    
-    
-    //left border
-    CALayer *leftBorder = [CALayer layer];
-    leftBorder.frame = CGRectMake(0.0f, textField.frame.size.height-3, 1.0f,3);
-    leftBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [textField.layer addSublayer:leftBorder];
-    
-    //right border
-    CALayer *rightBorder = [CALayer layer];
-    rightBorder.frame = CGRectMake(textField.frame.size.width-1,textField.frame.size.height-3, 1.0f,3);
-    rightBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [textField.layer addSublayer:rightBorder];
 }
 @end

@@ -9,15 +9,9 @@
 #import <UIKit/UIKit.h>
 #import <Google/CloudMessaging.h>
 
-//GA
-#import <GoogleAnalytics/GAI.h>
-
 @interface AppDelegate : UIResponder <UIApplicationDelegate,GGLInstanceIDDelegate,GCMReceiverDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-
-//GA
-@property (strong, nonatomic) id<GAITracker> tracker;
 
 
 //GCM

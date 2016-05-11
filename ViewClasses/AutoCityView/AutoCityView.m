@@ -30,7 +30,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
+    //[self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
 }
 
 

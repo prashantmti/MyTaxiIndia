@@ -10,6 +10,7 @@
 
 @interface MyBookingCell : UITableViewCell
 
+@property (strong, nonatomic) IBOutlet UIImageView *imgTripIcon;
 @property (strong, nonatomic) IBOutlet UILabel *lblBookingID;
 @property (strong, nonatomic) IBOutlet UILabel *lblTripFrom;
 @property (strong, nonatomic) IBOutlet UILabel *lblTripTo;
@@ -18,4 +19,6 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *btnCallDriver;
 @property (weak, nonatomic) IBOutlet UIButton *btnTrackDriver;
+
+@property (weak, nonatomic) IBOutlet UIView *view1;
 @end

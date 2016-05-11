@@ -23,6 +23,14 @@
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
 //
+#import "UserDefault.h"
+
+//GS
+#import <Google/SignIn.h>
+
+//Flurry
+#import <Flurry.h>
+
 @import GoogleMaps;
 
 @interface AppDelegate ()
@@ -62,9 +70,6 @@ NSString *const SubscriptionTopic = @"/topics/global";
     if ([UIApplication instancesRespondToSelector:@selector(registerUserNotificationSettings:)]){
         [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound categories:nil]];
     }
-
-    //GA
-    [self initGA];
     
     //GCM
     [self initGCM:application];
@@ -72,13 +77,20 @@ NSString *const SubscriptionTopic = @"/topics/global";
     //FB
     [[FBSDKApplicationDelegate sharedInstance] application:application
                              didFinishLaunchingWithOptions:launchOptions];
-    
+
     //GMS
     [GMSServices provideAPIKey:@"AIzaSyBylG_bu-wkTE7E4fZZRg5hKDIWmQ7vdQQ"];
+    
+    //For GA
+    [GIDSignIn sharedInstance].clientID = @"176773253945-icvpnuncobd6lk5vjg6jg56ooi5epmig.apps.googleusercontent.com";
+    
+    //for Flurry
+    [Flurry startSession:@"7STMT29MHTBSDPYXTX6R"];
+    
+    //
+    [[UIApplication sharedApplication] cancelAllLocalNotifications];
     return YES;
 }
-
-
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -106,10 +118,7 @@ NSString *const SubscriptionTopic = @"/topics/global";
 }
 
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    //GA
-    [GAI sharedInstance].optOut =![[NSUserDefaults standardUserDefaults] boolForKey:GAAllowTracking];
-    
+- (void)applicationDidBecomeActive:(UIApplication *)application {    
     //GCM
     // Connect to the GCM server to receive non-APNS notifications
     [[GCMService sharedInstance] connectWithHandler:^(NSError *error) {
@@ -128,19 +137,6 @@ NSString *const SubscriptionTopic = @"/topics/global";
     [FBSDKAppEvents activateApp];
 }
 
-
--(void)initGA{
-    NSDictionary *appDefaults = @{GAAllowTracking: @(YES)};
-    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
-    
-    // User must be able to opt out of tracking
-    [GAI sharedInstance].optOut =![[NSUserDefaults standardUserDefaults] boolForKey:GAAllowTracking];
-    [[GAI sharedInstance].logger setLogLevel:kGAILogLevelNone];
-    [GAI sharedInstance].dispatchInterval = -1;
-    [GAI sharedInstance].trackUncaughtExceptions = NO;
-    self.tracker = [[GAI sharedInstance] trackerWithName:GATrackerName trackingId:GATrackingId];
-}
-
 //GCM
 -(void)initGCM:(UIApplication *)application
 {
@@ -156,8 +152,8 @@ NSString *const SubscriptionTopic = @"/topics/global";
     NSError* configureError;
     [[GGLContext sharedInstance] configureWithError:&configureError];
     NSAssert(!configureError, @"Error configuring Google services: %@", configureError);
-    _gcmSenderID = [[[GGLContext sharedInstance] configuration] gcmSenderID];
     
+    _gcmSenderID = [[[GGLContext sharedInstance] configuration] gcmSenderID];
     NSLog(@"_gcmSenderID===>%@",_gcmSenderID);
     
 
@@ -231,7 +227,7 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     instanceIDConfig.delegate = self;
     
     //
-    instanceIDConfig.logLevel = kGAILogLevelVerbose;
+    instanceIDConfig.logLevel = kGCMLogLevelError;
     //
     // Start the GGLInstanceID shared instance with the that config and request a registration
     // token to enable reception of notifications
@@ -316,12 +312,11 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
 {
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle: nil];
     CouponListingView *clv = [mainStoryboard instantiateViewControllerWithIdentifier:@"CouponListingView"];
-    
+    //
     UINavigationController *frontNavigationController = [[UINavigationController alloc] initWithRootViewController:clv];
     NavigationView *rearViewController = (NavigationView*)[mainStoryboard instantiateViewControllerWithIdentifier: @"NavigationView"];
-    
+    //
     SWRevealViewController *mainRevealController = [[SWRevealViewController alloc]  init];
-    
     mainRevealController.rearViewController = rearViewController;
     mainRevealController.frontViewController= frontNavigationController;
     self.window.rootViewController = mainRevealController;
@@ -329,13 +324,6 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
 
 -(void)playLocalNotification:(UIApplication*)application userInfo:(NSDictionary*)userInfo{
     NSString *alert=[[[userInfo valueForKey:@"aps"] valueForKey:@"alert"] valueForKey:@"body"];
-    //
-    UILocalNotification* localNotification = [[UILocalNotification alloc] init];
-    localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
-    localNotification.alertBody = alert;
-    localNotification.timeZone = [NSTimeZone defaultTimeZone];
-    localNotification.soundName=UILocalNotificationDefaultSoundName;
-    [application presentLocalNotificationNow:localNotification];
     //
     UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:@"MyTaxiIndia" message:alert delegate:self cancelButtonTitle:@"Dismiss" otherButtonTitles:@"Show", nil] ;
     [alertView show];
@@ -350,10 +338,49 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
 
 //FB
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    return [[FBSDKApplicationDelegate sharedInstance] application:application
-                                                          openURL:url
-                                                sourceApplication:sourceApplication
-                                                       annotation:annotation
-            ];
+    //
+    //return [[FBSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+    
+    if ([[GIDSignIn sharedInstance] handleURL:url sourceApplication:sourceApplication annotation:annotation]) {
+        return YES;
+    }else if([[FBSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:sourceApplication annotation:annotation]){
+        return YES;
+    }else{
+        return NO;
+    }
 }
+
+//GS
+//- (BOOL)application:(UIApplication *)app
+//            openURL:(NSURL *)url
+//            options:(NSDictionary *)options {
+//    return [[GIDSignIn sharedInstance] handleURL:url
+//                               sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
+//                                      annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
+//}
+//
+//- (void)signIn:(GIDSignIn *)signIn
+//didSignInForUser:(GIDGoogleUser *)user
+//     withError:(NSError *)error {
+//    
+//    
+//     NSLog(@"sign call in app delegate==============>");
+//    // Perform any operations on signed in user here.
+//    NSString *userId = user.userID;                  // For client-side use only!
+//    NSString *idToken = user.authentication.idToken; // Safe to send to the server
+//    NSString *fullName = user.profile.name;
+//    NSString *givenName = user.profile.givenName;
+//    NSString *familyName = user.profile.familyName;
+//    NSString *email = user.profile.email;
+//    
+//    //
+//    NSLog(@"userId===>%@",userId);
+//    NSLog(@"idToken===>%@",idToken);
+//    NSLog(@"fullName===>%@",fullName);
+//    NSLog(@"givenName===>%@",givenName);
+//    NSLog(@"familyName===>%@",familyName);
+//    NSLog(@"email===>%@",email);
+//    // ...
+//    // ...
+//}
 @end

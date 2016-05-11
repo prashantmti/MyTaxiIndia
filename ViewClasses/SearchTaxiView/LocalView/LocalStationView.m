@@ -20,11 +20,16 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    NSLog(@"current date===>%@",[self currentDate]);
+    NSLog(@"current date===>%@",[self currentDateStr]);
     //
     self.mg=[ModalGlobal sharedManager];
     //
-    [self setTextBoxStyleLine:_tfPickUpCity];
-    [self setTextBoxStyleLine:_tfDays];
+    _barButton.target = self.revealViewController;
+    _barButton.action = @selector(revealToggle:);
+    //
+    [self setTextBoxLine:_tfPickUpCity];
+    [self setTextBoxLine:_tfDays];
     //
     [self setCDOnDatesView];
     
@@ -35,6 +40,20 @@
     [self setGesturesOnDPView1];
     //
     [self setUI];
+    //
+    [self setFlurry:@"Local Booking" params:nil];
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:YES];
+    //
+    if ([self.mg.mbt.tripActionComplete isEqual:@"YES"]) {
+        _tfPickUpCity.text=nil;
+        _tfDays.text=nil;
+        [self setCDOnDatesView];
+    }
+    //
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pushToAutoLocation:) name:@"pushToAutoLocationforLocal" object:nil];
 }
 
 -(void)setUI
@@ -44,55 +63,29 @@
     [self setBoxShadow:uvView2];
     [self setBoxShadow:DPView1];
     //
-    [self setButtonShadow:_btnSearchTaxi];
+    //[self setButtonShadow:_btnSearchTaxi];
     
     //
     _isShowPicker=FALSE;
 }
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    [self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
+    //[self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
 }
-
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
--(void)viewWillAppear:(BOOL)animated{
-    //
-    if ([self.mg.mbt.tripActionComplete isEqual:@"YES"]) {
-        _tfPickUpCity.text=nil;
-        _tfDays.text=nil;
-        [self setCDOnDatesView];
-    }
-    
-    //
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pushToAutoLocation:) name:@"pushToAutoLocationforLocal" object:nil];
-}
-
-
 -(void)pushToAutoLocation:(NSNotification *)notis{
     
     NSDictionary *returnResponse = notis.userInfo;
-    
     //NSString *locality=[[returnResponse valueForKey:@"locationDic"] valueForKey:@"locality"];
     NSString *city=[[returnResponse valueForKey:@"locationDic"] valueForKey:@"city"];
     NSString *state=[[returnResponse valueForKey:@"locationDic"] valueForKey:@"state"];
     //NSString *country=[[returnResponse valueForKey:@"locationDic"] valueForKey:@"country"];
-
+    
     NSString *location=[NSString stringWithFormat:@"%@, %@",city,state];
     
     if ([[returnResponse valueForKey:@"locationTag"] integerValue]==101) {
@@ -110,7 +103,7 @@
     //  tripTag 0:for local | 1 for outstation
     textField.keyboardAppearance=false;
     AutoCityView *acv = [self.storyboard instantiateViewControllerWithIdentifier:@"AutoCityView"];
-   // acv.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    // acv.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     acv.tripTag=2;
     switch (textField.tag) {
         case 101:{
@@ -156,20 +149,20 @@
 //-(void)callService1{
 //
 //    NSInteger val=[[self splitString:_tfDays.text pattern:@" "][0] integerValue]*8;
-//    
+//
 //    WebServiceClass *WSC = [[WebServiceClass alloc] init];
 //    NSString *auth=[self createAuth:merchantId string2:[self uniqueTstamp] string3:authPassword];
 //    NSMutableDictionary *postDic=[[NSMutableDictionary alloc]init];
 //    [postDic setObject:merchantId forKey:@"merchantId"];
 //    [postDic setObject:[self uniqueTstamp] forKey:@"salt"];
-//    
+//
 //    [postDic setObject:[selectedTripCites valueForKey:@"city1"] forKey:@"cityIds"];
 //    //[postDic setObject:[selectedTripCites valueForKey:@"city1"] forKey:@"regionIds"];
 //    [postDic setObject:@"2" forKey:@"tripType"];
 //    [postDic setObject:pickupDate forKey:@"pickupDate"];
 //    //[postDic setObject:DPView1Lbldd.text forKey:@"dropDate"];
 //    [postDic setObject:[NSString stringWithFormat:@"%ld",(long)val] forKey:@"hours"];
-//    
+//
 //    [WSC getServerResponseForUrl:postDic serviceURL:IDSearchTaxi isPOST:YES isLoder:YES auth:auth view:self.view  withCallback:^(BOOL success, NSDictionary *response, NSError *error) {
 //        if (success) {
 //            if ([[response valueForKey:@"status"] isEqualToString:@"error"])
@@ -179,7 +172,7 @@
 //            }
 //            else{
 //            cabList=[[[response valueForKey:@"result"] valueForKey:@"results"] valueForKey:@"taxis"];
-//            
+//
 //            CabListView *cdv = [self.storyboard instantiateViewControllerWithIdentifier:@"CabListView"];
 //            cdv.cabList=cabList;
 //            [self.navigationController pushViewController:cdv animated:YES];
@@ -193,7 +186,7 @@
 
 -(void)callService{
     
-     NSInteger val=[[self splitString:_tfDays.text pattern:@" "][0] integerValue]*8;
+    NSInteger val=[[self splitString:_tfDays.text pattern:@" "][0] integerValue]*8;
     
     //set setModalBaseTaxi
     self.mg.mbt.departureDate=pickupDate;
@@ -213,7 +206,7 @@
     [postDic setObject:self.mg.mbt.tripType forKey:@"tripType"];
     [postDic setObject:self.mg.mbt.departureDate forKey:@"pickupDate"];
     [postDic setObject:self.mg.mbt.tripSelectDays forKey:@"hours"];
-
+    
     [WSC getServerResponseForUrl:postDic serviceURL:IDSearchTaxi isPOST:YES isLoder:YES auth:auth view:self.view  withCallback:^(BOOL success, NSDictionary *response, NSError *error) {
         if (success) {
             if ([[response valueForKey:@"status"] isEqualToString:@"error"])
@@ -282,18 +275,23 @@
     //pickerView
     datePicker=[[UIDatePicker alloc]initWithFrame:CGRectMake(0, self.view.bounds.size.height+44,orgW, orgPVH)];
     datePicker.backgroundColor=[UIColor whiteColor];
-    
-    datePicker.datePickerMode = UIDatePickerModeDate;
+    datePicker.datePickerMode = UIDatePickerModeDateAndTime;
+    //
+    NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+    datePicker.locale=locale;
+    //
+    datePicker.minuteInterval=5;
     [datePicker addTarget:self action:@selector(pickerAction:) forControlEvents:UIControlEventValueChanged]; // method to respond to changes in the picker value
     
     //Set Date
-    datePicker.date=[self dateStringToDate:pickupDate];
-    datePicker.minimumDate=[self dateInIST];
-    
-    [datePicker setMinimumDate:[NSDate date]];
-    [datePicker setMaximumDate:[self dateWithNextYearDate:[NSDate date]]];
-    //
     datePicker.tag=tag;
+    //
+    datePicker.timeZone=[NSTimeZone timeZoneWithAbbreviation:@"IST"];
+    //
+    datePicker.date=[self dateStringToDateTime:pickupDate];
+    datePicker.minimumDate=[self dateInIST];
+    datePicker.maximumDate=[self dateWithNextYearDate:[self dateInIST]];
+    //
     [self.view addSubview:datePicker];
     
     //toolBar
@@ -334,11 +332,13 @@
 -(void)IDRightTBBtnAction:(UIBarButtonItem*)sender
 {
     _isShowPicker=FALSE;
-    NSString *dateString=[self dateWith_ddMMyyyy:datePicker.date];
+    //
+    NSString *dateStringhhmm=[self dateWith_ddMMyyyyhhmm:datePicker.date];
+    //
     NSArray *dateStyleArray=[self splitString:[self dateWith_ddLLLLyyEEEE:datePicker.date] pattern:@"/"];
     
     if (sender.tag==1001){
-        pickupDate=dateString;
+        pickupDate=dateStringhhmm;
         _lbDpView1dd.text=[self textWithOrdinalStyle:dateStyleArray[0]];
         _lbDpView1mmyy.text=[NSString stringWithFormat:@"%@ %@",dateStyleArray[1],dateStyleArray[2]];
         _lbDpView1Day.text=dateStyleArray[3];
@@ -357,7 +357,6 @@
     [UIView commitAnimations];
 }
 
-
 - (void)removeViews:(id)object {
     [datePicker removeFromSuperview];
     [datePicker removeFromSuperview];
@@ -372,7 +371,7 @@
 
 -(void)setCDOnDatesView
 {
-    NSString *dateString=[self dateWith_ddMMyyyy:[NSDate date]];
+    NSString *dateString=[self dateWith_ddMMyyyyhhmm:[NSDate date]];
     NSArray *dateStyleArray=[self splitString:[self dateWith_ddLLLLyyEEEE:[NSDate date]] pattern:@"/"];
     
     pickupDate=dateString;
@@ -380,30 +379,5 @@
     _lbDpView1dd.text=[self textWithOrdinalStyle:dateStyleArray[0]];
     _lbDpView1mmyy.text=[NSString stringWithFormat:@"%@ %@",dateStyleArray[1],dateStyleArray[2]];
     _lbDpView1Day.text=dateStyleArray[3];
-}
-
--(void)setTextBoxStyleLine:(UITextField*)textField
-{
-    textField.backgroundColor=[UIColor clearColor];
-    textField.borderStyle=UITextBorderStyleNone;
-    
-    //Bottom border
-    CALayer *bottomBorder = [CALayer layer];
-    bottomBorder.frame = CGRectMake(0.0f, textField.frame.size.height - 1, textField.frame.size.width, 1.0f);
-    bottomBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [textField.layer addSublayer:bottomBorder];
-    
-    
-    //left border
-    CALayer *leftBorder = [CALayer layer];
-    leftBorder.frame = CGRectMake(0.0f, textField.frame.size.height-3, 1.0f,3);
-    leftBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [textField.layer addSublayer:leftBorder];
-    
-    //right border
-    CALayer *rightBorder = [CALayer layer];
-    rightBorder.frame = CGRectMake(textField.frame.size.width-1,textField.frame.size.height-3, 1.0f,3);
-    rightBorder.backgroundColor =[self colorWithCode:@"242424"].CGColor;
-    [textField.layer addSublayer:rightBorder];
 }
 @end

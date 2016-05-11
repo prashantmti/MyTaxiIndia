@@ -27,7 +27,7 @@ extern NSString *const IDCabReview;
 
 extern NSString *const IDApplyCoupon;
 
-extern NSString *const IDupdateCustomerDetails;
+extern NSString *const IDUpdateCustomerDetails;
 
 extern NSString *const IDconfirmBooking;
 
@@ -41,4 +41,15 @@ extern NSString *const IDPromos;
 
 extern NSString *const IDGetDriverLocation;
 
+extern NSString *const IDUserSignIn;
+
+extern NSString *const IDFBMtiRegister;
+
+extern NSString *const IDUpdateCustomerProfile;
+
+extern NSString *const IDFBMtiLogin;
+
+extern NSString *const IDUserCP;    //change password
+
+extern NSString *const IDMtiResetPassword;
 @end

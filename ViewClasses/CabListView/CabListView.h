@@ -22,11 +22,7 @@
 
 @property (strong, nonatomic) NSDictionary *DicSelectedCab;
 
-@property (strong, nonatomic) NSDictionary *DicTripDates;
 //@property (assign, nonatomic) NSInteger noOfCars;
-
-
-@property (strong, nonatomic) ModalGlobal *mg;
 
 @property (strong, nonatomic) ModalBaseTaxis *mbt;
 @end

@@ -28,13 +28,24 @@
     [self setBoxShadow:vwMain];
     
     [self setGesturesOnUvCallSupport];
+    
+    //
+    
+    //
+    if (![[UserDefault userDetails] isEqual:nil]) {
+        _TFName.text=[self validateNullValue:[[UserDefault userDetails] valueForKey:@"name"] isString:YES];
+        _TFEmailID.text=[self validateNullValue:[[UserDefault userDetails] valueForKey:@"email"] isString:YES];
+        _TFPhoneNo.text=[self validateNullValue:[[UserDefault userDetails] valueForKey:@"phone"] isString:YES];
+    }
+    
+    [self setFlurry:@"Call Support" params:nil];
 }
 
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
+    //[self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
 }
 
 
@@ -103,7 +114,7 @@
 
 -(IBAction)callPhone:(id)sender {
     //8882001133
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"tel:8882001133"]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"tel:+91-888-200-1133"]];
 }
 
 //set gesture on call support

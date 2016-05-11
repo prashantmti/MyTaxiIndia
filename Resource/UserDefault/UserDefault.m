@@ -10,63 +10,39 @@
 
 @implementation UserDefault
 
-
-//  for user ID
-+ (NSString *)userID
-{
-    return [[NSUserDefaults standardUserDefaults] objectForKey:@"userID"];
++ (void)load{
+    NSLog(@"UserDefault");
 }
 
-+ (void)setUserID:(NSString *)userID
-{
+
+//  for user ID
++ (NSString *)userID{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"userID"];
+}
++ (void)setUserID:(NSString *)userID{
     [[NSUserDefaults standardUserDefaults] setObject:userID forKey:@"userID"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-+ (NSString *)bookingID
-{
-    return [[NSUserDefaults standardUserDefaults] objectForKey:@"bookingID"];
-}
 
-+ (void)setBookingID:(NSString *)bookingID
-{
-    [[NSUserDefaults standardUserDefaults] setObject:bookingID forKey:@"bookingID"];
+//  for login tag
++ (NSString*)loginTag{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"loginTag"];
+}
++ (void)setLoginTag:(NSString *)loginTag{
+    [[NSUserDefaults standardUserDefaults] setObject:loginTag forKey:@"loginTag"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-//  for user email
-- (NSString *)userEmail
-{
-    return [[NSUserDefaults standardUserDefaults] objectForKey:@"userEmail"];
+//  for user info
++ (NSDictionary *)userDetails{
+    NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:@"userDetails"];
+    NSDictionary *retrievedDictionary = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    return retrievedDictionary;
 }
-
-- (void)setUserEmail:(NSString *)userEmail
-{
-    [[NSUserDefaults standardUserDefaults] setObject:userEmail forKey:@"userEmail"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-//  for user mobile no
-- (NSString *)userMobileNo
-{
-    return [[NSUserDefaults standardUserDefaults] objectForKey:@"userMobileNo"];
-}
-
-- (void)setUserMobileNo:(NSString *)userMobileNo
-{
-    [[NSUserDefaults standardUserDefaults] setObject:userMobileNo forKey:@"userMobileNo"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-//  for user addresss
-- (NSString *)userAddress
-{
-    return [[NSUserDefaults standardUserDefaults] objectForKey:@"userAddress"];
-}
-
-- (void)setUserAddress:(NSString *)userAddress
-{
-    [[NSUserDefaults standardUserDefaults] setObject:userAddress forKey:@"userAddress"];
+//  for user info
++ (void)setUserDetails:(NSDictionary *)userDetails{
+    [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:userDetails] forKey:@"userDetails"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 @end

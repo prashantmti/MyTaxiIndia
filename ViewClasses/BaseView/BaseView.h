@@ -9,15 +9,13 @@
 #import <UIKit/UIKit.h>
 #import "WebServiceClass.h"
 #import "CustomBarButton.h"
+#import "SWRevealViewController.h"
 
 
-//GA
 #import "AppDelegate.h"
-#import "GAI.h"
-#import "GAIDictionaryBuilder.h"
 #import "ModalGlobal.h"
 
-@interface BaseView : UIViewController<NSURLSessionDelegate,UIPickerViewDataSource,UIPickerViewDelegate>
+@interface BaseView : UIViewController<NSURLSessionDelegate,UIPickerViewDataSource,UIPickerViewDelegate,SWRevealViewControllerDelegate,UIGestureRecognizerDelegate>
 {
     UIPickerView *pickerView;
     NSArray *pickerDataArray;
@@ -26,8 +24,6 @@
     
     
     UIToolbar *toolBar;
-    NSDictionary *resultDic;
-    
     
     UITextField *currentTextField;
     
@@ -48,6 +44,7 @@
 -(BOOL)validateEmail:(NSString *)email;
 -(BOOL)validateMobile:(NSString *)mobile;
 -(BOOL)validateAddress:(NSString *)string;
+-(BOOL)validateJP:(NSString *)string;
 
 //  alertView methods
 -(void)alertWithText:(NSString*)title message:(NSString*)message;
@@ -76,17 +73,10 @@
 
 -(NSString*)validateNullValue:(id)value isString:(BOOL)isString;
 
-//GA
--(void)GATrackOnView:(NSString*)className kGAIScreenName:(NSString*)kGAIScreenName;
-
-
-
-
-
-
 -(NSString*)setRs:(NSString*)value;
 
 -(NSString*)valueRoundOff:(NSString*)string;
+-(NSString*)valueRoundOff8:(NSString*)string;
 
 -(void)setLabelUnderLine:(UILabel*)label;
 -(void)setTextBoxLine:(UITextField*)textField;
@@ -100,6 +90,9 @@
 
 
 // --------------------Start Date format method-----------------------//
+-(NSDate*)currentDate;
+-(NSString*)currentDateStr;
+-(NSDate*)msToDate:(NSString*)ms;
 -(NSDate*)dateInIST;
 -(NSDate*)dateStringToDate:(NSString*)dateString;
 -(NSDate*)dateStringToDateTime:(NSString*)dateString;
@@ -111,6 +104,8 @@
 -(NSString*)dateWith_ddMMMyyEEE:(NSDate*)dateStr;
 -(NSString*)dateWith_ddLLLLyyEEEE:(NSDate*)dateStr;
 -(NSString*)msToTimeUTC:(NSString*)msStr;
+-(NSString*)msToUTCms:(NSString*)msStr;
+-(NSString*)currentToUTCms;
 -(int)dateTimeDiff:(NSString*)pickerTimeStr;
 //change milisecond to date
 -(NSString*)msWithOrdinalStyle_ddMMyy:(NSString*)ms;
@@ -119,4 +114,9 @@
 
 
 -(NSString*)trimValue:(NSString*)string;
+
+//
+-(NSString*)getCity:(NSString*)string;
+//
+-(void)setFlurry:(NSString*)logEvent params:(NSDictionary*)params;
 @end

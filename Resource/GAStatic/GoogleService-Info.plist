@@ -4,6 +4,10 @@
 <dict>
 	<key>TRACKING_ID</key>
 	<string>UA-71064376-1</string>
+	<key>CLIENT_ID</key>
+	<string>176773253945-icvpnuncobd6lk5vjg6jg56ooi5epmig.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.176773253945-icvpnuncobd6lk5vjg6jg56ooi5epmig</string>
 	<key>GCM_SENDER_ID</key>
 	<string>176773253945</string>
 	<key>PLIST_VERSION</key>
@@ -13,14 +17,16 @@
 	<key>IS_ADS_ENABLED</key>
 	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<true/>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
 	<false/>
 	<key>IS_GCM_ENABLED</key>
 	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<false/>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:176773253945:ios:a2e6480e4cdce88c</string>
+	<key>PROJECT_ID</key>
+	<string>mytaxiindia-3357e</string>
 </dict>
 </plist>

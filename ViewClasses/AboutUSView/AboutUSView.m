@@ -29,20 +29,15 @@
     
     //box shadow on main view
     [self setBoxShadow:vwMain];
+    
+    //
+    [self setFlurry:@"About Us" params:nil];
 }
 
--(void)viewWillAppear:(BOOL)animated{
-    UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-    localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];;
-    localNotification.alertBody =@"About Us";
-    localNotification.soundName = UILocalNotificationDefaultSoundName;
-    localNotification.applicationIconBadgeNumber = 1;
-    [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
-}
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
+    //[self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
 }
 
 

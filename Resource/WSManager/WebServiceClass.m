@@ -86,7 +86,6 @@ void(^getServerResponseForUrlCallback)(BOOL success, NSDictionary *response, NSE
 
         requestURL= [NSURL URLWithString:[urlStr stringByRemovingPercentEncoding]];
         NSLog(@"WS RequestURL===>%@",requestURL);
-    
         request = [[NSMutableURLRequest alloc] initWithURL:requestURL];
     
     if (isPOST) {
@@ -101,8 +100,7 @@ void(^getServerResponseForUrlCallback)(BOOL success, NSDictionary *response, NSE
     return request;
 }
 
--(NSMutableString*) makeKeyUsingDictionary:(NSDictionary*)SetDataDic
-{
+-(NSMutableString*) makeKeyUsingDictionary:(NSDictionary*)SetDataDic{
     NSMutableString *ps;   //parameter string
     ps=[[NSMutableString alloc]initWithString:@""];
     NSArray *dicKeyArray = [SetDataDic allKeys];

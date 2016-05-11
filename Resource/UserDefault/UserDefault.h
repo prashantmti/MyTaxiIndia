@@ -10,16 +10,14 @@
 
 @interface UserDefault : NSObject
 
-
-@property (nonatomic, strong) NSString *userName;
-@property (nonatomic, strong) NSString *userEmail;
-@property (nonatomic, strong) NSString *userMobileNo;
-@property (nonatomic, strong) NSString *userAddress;
-
-
 + (NSString *)userID;
 + (void)setUserID:(NSString *)userID;
 
-+ (NSString *)bookingID;
-+ (void)setBookingID:(NSString *)bookingID;
++ (NSDictionary *)userDetails;
++ (void)setUserDetails:(NSDictionary *)userDetails;
+
+
+// login tag:   0=false|1=true
++ (NSString*)loginTag;
++ (void)setLoginTag:(NSString*)loginTag;
 @end

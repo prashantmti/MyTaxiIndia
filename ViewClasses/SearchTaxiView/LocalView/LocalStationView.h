@@ -15,10 +15,11 @@
     IBOutlet UIView * uvView1;
     IBOutlet UIView * uvView2;
     IBOutlet UIView * DPView1;
-    
-    UIPickerView *dataPickerView;
 }
 
+//
+@property (weak,nonatomic) IBOutlet UIBarButtonItem *barButton;
+//
 @property (strong, nonatomic) IBOutlet UITextField *tfPickUpCity;
 @property (strong, nonatomic) IBOutlet UITextField *tfDays;
 
@@ -37,7 +38,5 @@
 @property (strong, nonatomic) NSArray *cabList;
 
 @property (weak, nonatomic) IBOutlet UIButton *btnSearchTaxi;
-
-@property (strong, nonatomic) ModalGlobal *mg;
 
 @end

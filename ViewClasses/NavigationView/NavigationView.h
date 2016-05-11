@@ -7,7 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "BaseView.h"
+#import "AboutUSView.h"
 
 @interface NavigationView : UITableViewController
-
+{
+    ModalGlobal *mg;
+}
 @end

@@ -19,14 +19,19 @@
     
     _barButton.target = self.revealViewController;
     _barButton.action = @selector(revealToggle:);
+    
+    //
+    [self setFlurry:@"MTI OfferZone" params:nil];
+    //
     [self callService];
+    
 }
 
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
+    //[self GATrackOnView:NSStringFromClass(self.class) kGAIScreenName:kGAIScreenName];
 }
 
 
@@ -52,23 +57,27 @@
     NSDictionary *couponDic=[aryCouponResult objectAtIndex:indexPath.row];
     //
     cell.lblCouponCode.text=[self validateNullValue:[couponDic valueForKey:@"couponCode"] isString:YES];
+    //
     cell.lblCouponType.text=[self validateNullValue:[couponDic valueForKey:@"couponType"] isString:YES];
+    //
+    if ([self validateNullValue:[couponDic valueForKey:@"tripType"] isString:YES].length==0) {
+        cell.lblTripType.text=@"ALL";
+    }else{
+        cell.lblTripType.text=[self validateNullValue:[couponDic valueForKey:@"tripType"] isString:YES];
+    }
     //
     if ([[couponDic valueForKey:@"percentDiscount"] isEqual:[NSNull null]]) {
         cell.lblDiscount.text=[NSString stringWithFormat:@"%@%@/-",rupee,[self validateNullValue:[couponDic valueForKey:@"absoluteDiscount"] isString:NO]];
     }else{
         cell.lblDiscount.text=[NSString stringWithFormat:@"%@%%",[self validateNullValue:[couponDic valueForKey:@"percentDiscount"] isString:NO]];
     }
-    //
     NSString *couponValidity=[self msWithOrdinalStyle_ddMMyy:[couponDic valueForKey:@"validUpto"]];
-    cell.lblCouponValidity.text=[self dateWithOrdinalStyle:couponValidity];
+    cell.lblCouponValidity.text=couponValidity;
     //
-    if ([self validateNullValue:[couponDic valueForKey:@"tripType"] isString:YES].length==0) {
-        cell.lblTripType.text=@"N/A";
-    }else{
-        cell.lblTripType.text=[self validateNullValue:[couponDic valueForKey:@"tripType"] isString:YES];
-    }
-    
+    cell.lblCouponMaxDicount.text=[NSString stringWithFormat:@"%@%@/-",rupee,[self validateNullValue:[couponDic valueForKey:@"maxDiscount"] isString:NO]];
+    //
+    cell.lblCouponMinValue.text=[NSString stringWithFormat:@"%@%@/-",rupee,[self validateNullValue:[couponDic valueForKey:@"minBookingVal"] isString:NO]];
+    //
     cell.couponCopy.tag=indexPath.row;
     [cell.couponCopy addTarget:self action:@selector(couponCopyAction:) forControlEvents:UIControlEventTouchUpInside];
     
@@ -81,12 +90,10 @@
 {
     CGPoint buttonPosition = [sender convertPoint:CGPointZero toView:self.TBCouponList];
     NSIndexPath *indexPath = [self.TBCouponList indexPathForRowAtPoint:buttonPosition];
-    if (indexPath != nil)
-    {
-        
+    if (indexPath != nil){
         NSDictionary *couponDic=[aryCouponResult objectAtIndex:indexPath.row];
         [[UIPasteboard generalPasteboard] setString:[couponDic valueForKey:@"couponCode"]];
-        [self alertWithText:@"" message:@"Coupon Copied."];
+        [self alertWithText:nil message:@"Coupon Copied."];
     }
 }
 
@@ -103,8 +110,7 @@
                     return ;
                 }else{
                     aryCouponResult=[response valueForKey:@"result"];
-                    if(aryCouponResult.count==0)
-                    {
+                    if(aryCouponResult.count==0){
                         TBCouponList.hidden=true;
                         CGRect screenRect = [[UIScreen mainScreen] bounds];
                         errorLbl=[[UILabel alloc]init];

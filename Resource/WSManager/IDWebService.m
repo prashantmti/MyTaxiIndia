@@ -11,13 +11,10 @@
 
 
 //Set Base URL
-//NSString *const IDBaseURL = @"http://api.mytaxiindia.com/";
-//NSString *const IDBaseURL = @"http://tms.mytaxiindia.com/";
-NSString *const IDBaseURL = @"http://52.33.249.28/";
-
+NSString *const IDBaseURL = @"http://api.mytaxiindia.com/";
+//NSString *const IDBaseURL = @"http://52.33.249.28/";
 
 //set Service URL
-
 NSString *const IDCityStartsWith= @"meta/cityStartsWith";
 //NSString *const IDAllCities= @"meta/allCities";
 NSString *const IDAllCities= @"meta/cityStartsWith";
@@ -34,7 +31,7 @@ NSString *const IDCabReview = @"v1/booking/review";
 
 NSString *const IDApplyCoupon= @"v1/booking/applyCoupon";
 
-NSString *const IDupdateCustomerDetails= @"v1/booking/updateCustomerDetails";
+NSString *const IDUpdateCustomerDetails= @"v1/booking/updateCustomerDetails";
 
 NSString *const IDconfirmBooking= @"v1/booking/confirmBooking";
 
@@ -47,5 +44,17 @@ NSString *const IDAdvancePayment=@"v1/booking/advancePayment";
 NSString *const IDPromos=@"v1/user/promos";
 
 NSString *const IDGetDriverLocation=@"meta/getDriverLocation";
+
+NSString *const IDUserSignIn=@"v1/user/login";
+
+NSString *const IDFBMtiRegister=@"v1/user/register";
+
+NSString *const IDUpdateCustomerProfile= @"v1/user/updateCustomer";
+
+NSString *const IDFBMtiLogin=@"v1/user/loginWithFacebook";
+
+NSString *const IDUserCP=@"v1/user/changePassword";
+
+NSString *const IDMtiResetPassword=@"v1/user/triggerResetPassword";
 
 @end

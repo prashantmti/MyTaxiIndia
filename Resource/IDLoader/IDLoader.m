@@ -26,11 +26,12 @@
     
     float height = [[UIScreen mainScreen] bounds].size.height;
     float width = [[UIScreen mainScreen] bounds].size.width;
-    CGPoint center = CGPointMake(view.frame.size.width/2, view.frame.size.height/2);
+    //CGPoint center = CGPointMake(view.frame.size.width/2, view.frame.size.height/2);
     
+    CGPoint center = CGPointMake(width/2, height/2);
     IDLoader *idLoader = [[IDLoader alloc] init];
     idLoader.frame=CGRectMake(0, 0, width, height);
-    idLoader.center = center;
+    //idLoader.center = center;
     [idLoader setBackgroundColor:[[IDLoader colorWithCode:@"dbdbdb"] colorWithAlphaComponent:0.9]];
     [view addSubview:idLoader];
     

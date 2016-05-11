@@ -33,20 +33,20 @@ NSString *const rupee=@"\u20B9";
 NSString *const merchantId=@"3";
 NSString *const authPassword=@"IOS";
 NSString *const sourceType=@"IOS";
-NSString *const couponActionMsg=@"Coupons only can be used for “Full Payment” and not applicable for “Pay Advance”. Would you like to change to “Pay Advance?";
+NSString *const couponActionMsg=@"Coupons can be only used for \"Full Payment\" and not applicable for \"Pay Advance\". Would you like to change to \"Pay Advance\"?";
 
 // for Live:        Mvc4Wg
 // for Testing:     gtKFFx/0MQaQP
 
-NSString *const merchantKey=@"gtKFFx";
+NSString *const merchantKey=@"Mvc4Wg";
 //also change self.paymentParam.environment on base payment
 
 NSString *const productInfo=@"taxipayment";
 
+//product
 NSString *const successUrl=@"http://tms.mytaxiindia.com/payment/iossuccess";
 NSString *const failureUrl=@"http://tms.mytaxiindia.com/payment/iosfailure";
-
-
+//test
 //NSString *const successUrl=@"https://payu.herokuapp.com/ios_success";
 //NSString *const failureUrl=@"https://payu.herokuapp.com/ios_failure";
 @end
